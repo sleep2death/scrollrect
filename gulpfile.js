@@ -2,13 +2,14 @@ var flash = require('gulp-flash');
 var gulp = require('gulp');
 gulp.task('default', function() {
   gulp.src('src/main.as')
-  .pipe(flash('bin/', {
+    .pipe(flash('bin/', {
       'static-link-runtime-shared-libraries': true,
       'swf-version': 15,
       'source-path': [
         './minimalcomps/src',
         './src'
       ],
-      'use-gpu': true,
+      'debug': true,
+      'optimize': false,
     }))
 });
