@@ -1,8 +1,10 @@
 package {
     import flash.display.*;
     import com.bit101.components.*;
+
     import flash.events.Event;
     import flash.geom.Rectangle;
+
     import flash.net.URLLoader;
     import flash.net.URLRequest;
 
@@ -17,6 +19,9 @@ package {
             this.stage.scaleMode = StageScaleMode.NO_SCALE;
 
             var meter : FPSMeter = new FPSMeter(this);
+
+            //testing sprites container
+            addChild(container);
 
             //create info label
             info = new Label(this);
@@ -55,10 +60,72 @@ package {
 
             data = AtlasSprite.createData(xml);
 
-            //createAtlasSprites();
-            //createBitmapDataSprites();
-            createBlitting();
+
+            createUI();
         }
+
+        private var aButton : PushButton;
+        private var bButton : PushButton;
+        private var cButton : PushButton;
+
+        private function createUI() : void {
+            aButton = new PushButton(this, 100, 4, 'SCROLL RECT', onAClick);
+            aButton.toggle = true;
+
+            bButton = new PushButton(this, 220, 4, 'BITMAPDATA SWAP', onBClick);
+            bButton.toggle = true;
+
+            cButton = new PushButton(this, 330, 4, 'BITTING', onCClick);
+            cButton.toggle = true;
+        }
+
+        private function reset() : void {
+            while(container.numChildren > 0){
+                container.removeChildAt(0);
+            }
+
+            aSprites = new Vector.<AtlasSprite>();
+            bSprites = new Vector.<BitmapDataSprite>();
+            cSprites = new Vector.<BlitSprite>();
+
+            this.removeEventListener(Event.ENTER_FRAME, aUpdate);
+            this.removeEventListener(Event.ENTER_FRAME, bUpdate);
+            this.removeEventListener(Event.ENTER_FRAME, cUpdate);
+
+            if(canvas){
+                canvas.bitmapData.dispose();
+                canvas = null;
+            }
+        }
+
+        private function onAClick(e:Event) : void {
+            reset();
+            if(aButton.selected == true){
+                createAtlasSprites();
+                bButton.selected = false;
+                cButton.selected = false;
+            }
+        }
+
+        private function onBClick(e:Event) : void {
+            reset();
+            if(bButton.selected == true){
+                createBitmapDataSprites();
+                aButton.selected = false;
+                cButton.selected = false;
+            }
+        }
+
+        private function onCClick(e:Event) : void {
+            reset();
+            if(cButton.selected == true){
+                createBlitting();
+                aButton.selected = false;
+                bButton.selected = false;
+            }
+        }
+
+        private var container : Sprite = new Sprite();
 
         private var aSprites : Vector.<AtlasSprite> = new Vector.<AtlasSprite>();
         private var spritesNum : uint = 200;
@@ -69,7 +136,7 @@ package {
                 var atlas : AtlasSprite = new AtlasSprite(bd, data);
                 atlas.oX = Math.random()* 1024 - 256;
                 atlas.oY = Math.random()* 768 - 256;
-                this.addChild(atlas);
+                container.addChild(atlas);
                 aSprites.push(atlas);
             }
 
@@ -92,7 +159,7 @@ package {
 
                 sprite.oX = Math.random()* 1024 - 256;
                 sprite.oY = Math.random()* 768 - 256;
-                this.addChild(sprite);
+                container.addChild(sprite);
                 bSprites.push(sprite);
             }
 
@@ -111,7 +178,7 @@ package {
 
         private function createBlitting() : void {
             canvas = new Bitmap(new BitmapData(1024, 768, true, 0x00000000));
-            this.addChild(canvas);
+            container.addChild(canvas);
 
             for(var i : int = 0; i < spritesNum; i++){
                 var sprite : BlitSprite = new BlitSprite(data);
